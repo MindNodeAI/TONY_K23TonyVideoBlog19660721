@@ -47,10 +47,11 @@
 </head>
 <body class="min-h-screen flex flex-col relative selection:bg-brand-gold selection:text-black">
 
+  <!-- Header -->
   <header class="fixed top-0 w-full z-40 glass border-b border-white/10">
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-4 md:gap-6 lg:gap-8">
-        <!-- 新增：手機版選單按鈕 -->
+        <!-- 手機版選單按鈕 -->
         <button id="btn-mobile-menu" class="md:hidden text-text-sec hover:text-white transition-colors p-1 -ml-1">
           <i class="ph ph-list text-2xl"></i>
         </button>
@@ -177,7 +178,6 @@
             <span id="player-date" class="text-xs text-text-sec font-medium ml-auto"></span>
           </div>
           <h2 id="player-title-full" class="text-xl md:text-2xl font-black text-white mb-4 leading-tight"></h2>
-          <!-- 關鍵字標籤顯示區 -->
           <div id="player-tags" class="flex flex-wrap gap-2 mb-6"></div>
           <div class="h-px w-full bg-white/10 mb-6"></div>
           <h4 class="text-sm font-bold text-text-sec uppercase tracking-widest mb-3 flex items-center gap-2"><i class="ph-fill ph-article text-brand-gold"></i> 策展摘要</h4>
@@ -187,14 +187,13 @@
     </div>
   </div>
 
-  <!-- 新增：側邊行動版選單 -->
+  <!-- 側邊行動版選單 -->
   <div id="mobile-menu" class="fixed inset-0 z-[400] bg-[#0B1727]/95 backdrop-blur-md transform -translate-x-full transition-transform duration-300 md:hidden flex flex-col">
      <div class="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-white/10 bg-[#07111F] shrink-0">
          <span class="text-brand-gold font-bold text-lg tracking-widest">TONY STUDIO</span>
          <button id="btn-close-mobile" class="text-text-sec hover:text-white p-2 rounded-full hover:bg-white/10 transition-colors"><i class="ph ph-x text-2xl"></i></button>
      </div>
      <div class="p-6 flex-grow overflow-y-auto">
-         <!-- 行動版搜尋 -->
          <div class="flex items-center bg-[#112240] rounded-xl px-4 py-3 border border-white/10 mb-8 focus-within:border-brand-gold/50 transition-colors">
              <i class="ph ph-magnifying-glass text-text-sec mr-3 text-lg"></i>
              <input type="text" id="mobile-global-search" placeholder="搜尋影片..." class="bg-transparent border-none outline-none text-base text-white w-full">
@@ -204,9 +203,7 @@
             <a href="#/home" class="mobile-nav-link text-white hover:text-brand-gold hover:bg-white/5 p-4 rounded-xl flex items-center transition-colors"><i class="ph-fill ph-house mr-4 text-xl"></i> 首頁</a>
             <a href="#/explore" class="mobile-nav-link text-white hover:text-brand-gold hover:bg-white/5 p-4 rounded-xl flex items-center transition-colors"><i class="ph-fill ph-compass mr-4 text-xl"></i> 四大系列</a>
             <a href="#/about" class="mobile-nav-link text-white hover:text-brand-gold hover:bg-white/5 p-4 rounded-xl flex items-center transition-colors"><i class="ph-fill ph-user mr-4 text-xl"></i> TONY 顧問</a>
-            
             <div class="h-px w-full bg-white/10 my-4"></div>
-            
             <a href="#/admin" id="link-admin-mobile" class="mobile-nav-link hidden text-brand-gold hover:bg-brand-gold/10 p-4 rounded-xl items-center transition-colors"><i class="ph-fill ph-gear-six mr-4 text-xl"></i> 管理員後台</a>
          </nav>
      </div>
@@ -222,13 +219,9 @@
 
     const State = {
       user: null, isAdmin: false, isInitialAuthResolved: false,
-      videos: [],
-      aiKey: sessionStorage.getItem('gemini_api_key') || '',
-      currentRoute: '',
-      searchQuery: '' // 記錄目前的搜尋關鍵字
+      videos: [], aiKey: sessionStorage.getItem('gemini_api_key') || '', currentRoute: '', searchQuery: ''
     };
 
-    // 擴充 SERIES_MAP 包含標題與描述
     const SERIES_MAP = {
       'plant-timelapse': { name: '植物花果生命縮時導演', desc: '見證種子萌芽、開花結果的奇妙過程，感受植物堅韌的生命力與靜謐的美感。' },
       'eco-documentary': { name: '昆蟲兩棲生命蛻變導演', desc: '紀錄羽化、蛻殼的關鍵瞬間，以微觀視角探索自然界令人驚嘆的蛻變奇蹟。' },
@@ -238,11 +231,9 @@
 
     const $ = (s) => document.querySelector(s);
     
-    // UI 公用程式
     const Utils = {
       showToast: (msg, type = 'info') => {
-        const container = $('#toast-container');
-        if(!container) return;
+        const container = $('#toast-container'); if(!container) return;
         const t = document.createElement('div');
         const colors = { success: 'bg-brand-green text-black', error: 'bg-red-500 text-white', info: 'bg-brand-blue text-white' };
         t.className = `flex items-center gap-3 ${colors[type]} px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-10 opacity-0 font-bold text-sm tracking-wide z-[9999]`;
@@ -255,27 +246,35 @@
       extractYoutubeId: (url) => { const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/); return (match && match[2].length === 11) ? match[2] : null; }
     };
 
-    /* --- STREAMING_CHUNK: 初始化 Firebase (防呆機制) --- */
+    /* --- STREAMING_CHUNK: 影片預覽 Hover 控制全域函數 --- */
+    window.startPreview = (el, vidId) => {
+        const container = el.querySelector('.preview-container');
+        if (!container) return;
+        // 延遲 0.5 秒，避免滑鼠快速經過時狂發 API Request
+        el.previewTimeout = setTimeout(() => {
+            // scale-[1.35] 放大把 Youtube 的標題跟 Logo 藏在畫面外，達到乾淨的預覽效果
+            container.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&loop=1&playlist=${vidId}" class="w-full h-full object-cover scale-[1.35] pointer-events-none origin-center" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
+            container.classList.remove('opacity-0');
+        }, 500);
+    };
+
+    window.stopPreview = (el) => {
+        clearTimeout(el.previewTimeout);
+        const container = el.querySelector('.preview-container');
+        if (!container) return;
+        container.classList.add('opacity-0');
+        // 等待淡出動畫完畢再清空
+        setTimeout(() => { container.innerHTML = ''; }, 300);
+    };
+
+    /* --- STREAMING_CHUNK: Firebase --- */
     let app, auth, db;
-    try {
-      app = initializeApp(firebaseConfig);
-      auth = getAuth(app);
-      db = getFirestore(app);
-    } catch(error) {
-      console.error("Firebase Init Error:", error);
-    }
+    try { app = initializeApp(firebaseConfig); auth = getAuth(app); db = getFirestore(app); } catch(error) { console.error("Firebase Init Error:", error); }
 
     let videosUnsubscribe = null;
     const DataService = {
       loadVideos: (forcePublicOnly = false) => {
-        // [強制防呆機制] 如果 db 初始化失敗，清空資料並強制渲染畫面，避免卡死
-        if (!db) {
-            console.warn("Firestore 不可用，啟用安全模式渲染。");
-            State.videos = [];
-            Views.renderCurrentRoute();
-            return;
-        }
-
+        if (!db) { State.videos = []; Views.renderCurrentRoute(); return; }
         if (videosUnsubscribe) videosUnsubscribe();
         
         const isQueryingAdmin = State.isAdmin && !forcePublicOnly;
@@ -289,43 +288,37 @@
           State.videos = vids;
           Views.renderCurrentRoute();
         }, err => {
-            console.error("Firestore Error:", err);
-            // 降級讀取公開資料，若還是失敗就強制解鎖畫面
-            if (err.code === 'permission-denied' && isQueryingAdmin) {
-                DataService.loadVideos(true);
-            } else {
-                Utils.showToast("資料庫連線失敗，啟用離線/安全模式", "error");
-                Views.renderCurrentRoute();
-            }
+            if (err.code === 'permission-denied' && isQueryingAdmin) DataService.loadVideos(true);
+            else { Utils.showToast("資料庫連線失敗，啟用安全模式", "error"); Views.renderCurrentRoute(); }
         });
       }
     };
 
-    /* --- STREAMING_CHUNK: 畫面渲染邏輯 --- */
+    /* --- STREAMING_CHUNK: 畫面渲染與卡片 --- */
     const UI = {
-      // 升級：縮圖改為底部漸層陰影，移除全暗遮罩
       renderCard: (v) => {
         const seriesName = SERIES_MAP[v.seriesId]?.name || '未分類';
-        
-        // 搜尋匹配高亮處理
         let title = Utils.escapeHtml(v.titleZh) || '未命名';
         if (State.searchQuery) {
             const regex = new RegExp(`(${Utils.escapeHtml(State.searchQuery)})`, 'gi');
             title = title.replace(regex, `<span class="bg-brand-gold text-black px-1 rounded">$1</span>`);
         }
 
+        // 卡片綁定了 onmouseenter / onmouseleave 事件觸發全域的預覽功能
         return `
-          <div onclick="window.openVideo('${v.id}')" class="group flex flex-col bg-[#0B1727] border border-white/10 rounded-2xl overflow-hidden cursor-pointer card-hover-fx relative">
+          <div onclick="window.openVideo('${v.id}')" class="group flex flex-col bg-[#0B1727] border border-white/10 rounded-2xl overflow-hidden cursor-pointer card-hover-fx relative" onmouseenter="window.startPreview(this, '${v.id}')" onmouseleave="window.stopPreview(this)">
             <div class="relative w-full aspect-video bg-black overflow-hidden">
-              <img src="${v.thumbnailUrl || 'https://placehold.co/600x337/112240/D7A84B?text=Video'}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700">
-              <!-- 更新：底部深色漸層，保留上方清晰度 -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80 group-hover:opacity-100 transition-opacity"></div>
+              <!-- 原始縮圖 (無黑邊遮罩) -->
+              <img src="${v.thumbnailUrl || 'https://placehold.co/600x337/112240/D7A84B?text=Video'}" class="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 z-0">
               
-              <div class="absolute bottom-3 left-3 bg-black/50 backdrop-blur-md text-brand-gold text-xs px-2.5 py-1 rounded font-bold shadow-lg border border-brand-gold/30 z-10">${seriesName}</div>
-              ${v.status === 'draft' ? `<div class="absolute top-2 right-2 bg-gray-600 text-white text-xs px-2 py-1 rounded font-bold shadow-lg z-10">草稿</div>` : ''}
-              ${v.status === 'published' && State.isAdmin ? `<div class="absolute top-2 right-2 bg-brand-green text-black text-xs px-2 py-1 rounded font-bold shadow-lg z-10">發布中</div>` : ''}
+              <!-- 動態預覽容器 -->
+              <div class="preview-container absolute inset-0 z-10 opacity-0 transition-opacity duration-300 pointer-events-none bg-black"></div>
+              
+              <div class="absolute bottom-3 left-3 bg-black/70 backdrop-blur-md text-brand-gold text-xs px-2.5 py-1 rounded font-bold shadow-lg border border-brand-gold/30 z-20">${seriesName}</div>
+              ${v.status === 'draft' ? `<div class="absolute top-2 right-2 bg-gray-600 text-white text-xs px-2 py-1 rounded font-bold shadow-lg z-20">草稿</div>` : ''}
+              ${v.status === 'published' && State.isAdmin ? `<div class="absolute top-2 right-2 bg-brand-green text-black text-xs px-2 py-1 rounded font-bold shadow-lg z-20">發布中</div>` : ''}
             </div>
-            <div class="p-5 flex flex-col flex-grow">
+            <div class="p-5 flex flex-col flex-grow relative z-20 bg-[#0B1727]">
               <h3 class="text-lg font-bold text-white leading-snug line-clamp-2 group-hover:text-brand-gold transition-colors">${title}</h3>
               <div class="flex items-center justify-between mt-3">
                  <p class="text-sm text-text-sec flex items-center gap-1 font-medium"><i class="ph-fill ph-clock"></i> ${v.createdAt ? new Date(v.createdAt.seconds * 1000).toLocaleDateString() : '剛剛'}</p>
@@ -337,33 +330,24 @@
     };
 
     const Views = {
-      // 根據當前路由重新繪製
       renderCurrentRoute: () => {
           if (['#/home', ''].includes(State.currentRoute)) Views.renderHome();
           else if (State.currentRoute === '#/explore') Views.renderExplore();
           else if (State.currentRoute === '#/admin' && State.isAdmin) Views.renderAdmin();
       },
-
-      // 取得過濾後的影片 (結合搜尋與權限)
       getDisplayVideos: () => {
           let vids = State.videos.filter(v => v.status === 'published' || State.isAdmin);
           if (State.searchQuery) {
               const q = State.searchQuery.toLowerCase();
-              vids = vids.filter(v => 
-                  (v.titleZh || '').toLowerCase().includes(q) ||
-                  (v.fullDescription || '').toLowerCase().includes(q) ||
-                  (v.tags || '').toLowerCase().includes(q)
-              );
+              vids = vids.filter(v => (v.titleZh || '').toLowerCase().includes(q) || (v.fullDescription || '').toLowerCase().includes(q) || (v.tags || '').toLowerCase().includes(q));
           }
           return vids;
       },
-
       renderHome: () => {
         const displayVideos = Views.getDisplayVideos();
         const isSearching = !!State.searchQuery;
         
         let html = ``;
-        // 如果不在搜尋狀態，顯示大橫幅
         if (!isSearching) {
             html += `
               <div class="relative w-full h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden mb-16 animate-fade-in">
@@ -372,14 +356,12 @@
                 <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-8">
                    <span class="inline-block py-1 px-3 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-sm font-bold tracking-widest mb-6">TONY STUDIO</span>
                    <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 drop-shadow-2xl leading-tight">探索自然生命的<br/><span class="text-brand-gold">奇妙瞬間</span></h1>
-                   <p class="text-lg text-text-sec mb-10 leading-relaxed max-w-2xl mx-auto font-medium">透過 10 秒高質感影片，捕捉自然界中發芽、成長、蛻變的關鍵時刻。</p>
+                   <p class="text-lg text-text-sec mb-10 leading-relaxed max-w-2xl mx-auto font-medium">透過 20 秒高質感影片，捕捉自然界中發芽、成長、蛻變的關鍵時刻。</p>
                 </div>
               </div>`;
         }
 
         html += `<div class="px-4 sm:px-6 lg:px-12 ${isSearching ? 'pt-8' : ''} pb-24 max-w-[1600px] mx-auto w-full space-y-24">`;
-
-        // 搜尋結果標題 或 預設標題
         html += `<section>
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
                <h2 class="text-2xl font-black text-white flex items-center gap-3">
@@ -400,7 +382,7 @@
                 <section class="border-t border-white/10 pt-20">
                     <div class="flex flex-col lg:flex-row gap-12 items-center bg-gradient-to-br from-[#0B1727] to-[#040A12] rounded-3xl p-10 lg:p-16 border border-white/5 shadow-2xl relative overflow-hidden">
                         <div class="absolute top-0 right-0 w-96 h-96 bg-brand-gold/5 rounded-full blur-3xl"></div>
-                        <img src="https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg" alt="TONY" class="w-56 h-56 rounded-full border-4 border-brand-gold object-cover shadow-[0_0_40px_rgba(215,168,75,0.2)] shrink-0 relative z-10" onerror="this.src='https://placehold.co/200/0B1727/D7A84B?text=TONY'">
+                        <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1787580326393_ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8819%E6%97%A5%20%E4%B8%8A%E5%8D%8811_16_14.png?alt=media&token=3c85de41-f36f-46e5-a97a-7bc7eb83a027" alt="TONY" class="w-56 h-56 rounded-full border-4 border-brand-gold object-cover shadow-[0_0_40px_rgba(215,168,75,0.2)] shrink-0 relative z-10" onerror="this.src='https://placehold.co/200/0B1727/D7A84B?text=TONY'">
                         <div class="text-center lg:text-left relative z-10 flex flex-col items-center lg:items-start">
                             <h2 class="text-4xl font-black text-white mb-3">TONY 楊文澤 老師</h2>
                             <p class="text-brand-gold font-bold mb-6 tracking-wide uppercase text-sm">資深數位行銷科技顧問 / 生成式 AI 創作者 / 創業導師</p>
@@ -414,7 +396,7 @@
         $('#app-view').innerHTML = html;
       },
 
-      /* --- STREAMING_CHUNK: 探索頁面 (新增錨點與系列介紹) --- */
+      /* --- STREAMING_CHUNK: 探索頁面 (錨點與系列介紹) --- */
       renderExplore: () => {
         let html = `
           <div class="px-4 sm:px-6 lg:px-12 py-12 max-w-[1600px] mx-auto w-full animate-fade-in">
@@ -423,7 +405,6 @@
                <h1 class="text-4xl md:text-5xl font-black text-white mb-4">探索四大系列</h1>
                <p class="text-text-sec text-lg max-w-2xl mx-auto mb-10">依照不同生態主題分類，深入體驗每一個生命奇蹟的瞬間。</p>
                
-               <!-- 錨點導覽列 -->
                <div class="flex flex-wrap items-center justify-center gap-3">
                    ${Object.keys(SERIES_MAP).map(k => `<a href="#series-${k}" class="px-4 py-2 bg-[#112240] hover:bg-brand-gold hover:text-black text-white rounded-full font-bold text-sm border border-white/10 transition-colors shadow-lg"><i class="ph-fill ph-hash text-xs mr-1 opacity-70"></i>${SERIES_MAP[k].name.replace('導演','')}</a>`).join('')}
                </div>
@@ -440,7 +421,6 @@
         Object.keys(SERIES_MAP).forEach(seriesKey => {
             const seriesVids = displayVideos.filter(v => v.seriesId === seriesKey);
             if(seriesVids.length > 0) {
-                // 系列專屬區塊，加入 ID 供錨點跳轉，並加上專屬介紹
                 html += `
                     <div id="series-${seriesKey}" class="mb-20 scroll-mt-24 bg-gradient-to-b from-[#0B1727]/50 to-transparent p-6 sm:p-8 rounded-3xl border border-white/5">
                         <div class="mb-8 max-w-3xl">
@@ -460,18 +440,76 @@
         $('#app-view').innerHTML = html;
       },
 
+      /* --- STREAMING_CHUNK: TONY 顧問完整經歷 --- */
       renderAbout: () => {
-          // 省略重複內容，保持原有 About
-          $('#app-view').innerHTML = `<div class="py-32 text-center text-white"><h2 class="text-3xl font-bold">TONY 楊文澤 老師簡介</h2><p class="text-text-sec mt-4">請參考首頁底部的完整經歷或前次提供的完整版面。</p></div>`;
+          const avatarUrl = "https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1787580326393_ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8819%E6%97%A5%20%E4%B8%8A%E5%8D%8811_16_14.png?alt=media&token=3c85de41-f36f-46e5-a97a-7bc7eb83a027";
+          $('#app-view').innerHTML = `
+          <div class="px-4 sm:px-6 lg:px-12 py-16 max-w-[1200px] mx-auto w-full animate-fade-in">
+              <div class="bg-gradient-to-b from-[#0B1727] to-[#07111F] rounded-3xl p-8 lg:p-16 border border-white/10 shadow-2xl relative overflow-hidden">
+                   <div class="absolute top-[-10%] right-[-10%] w-[500px] h-[500px] bg-brand-gold/10 rounded-full blur-[100px] pointer-events-none"></div>
+                   <div class="flex flex-col lg:flex-row gap-16 items-start relative z-10">
+                       <div class="shrink-0 flex flex-col items-center mx-auto lg:mx-0">
+                          <div class="relative">
+                              <div class="absolute inset-0 bg-brand-gold/30 rounded-full blur-xl animate-pulse"></div>
+                              <img src="${avatarUrl}" alt="TONY" class="w-64 h-64 rounded-full border-4 border-brand-gold object-cover relative z-10 shadow-2xl">
+                          </div>
+                          <div class="mt-8 text-center">
+                              <h1 class="text-3xl md:text-4xl font-black text-white mb-3">TONY 楊文澤 老師</h1>
+                              <p class="text-text-sec font-bold tracking-wider text-sm mt-1">資深數位行銷科技顧問</p>
+                              <p class="text-text-sec font-bold tracking-wider text-sm mt-1">生成式 AI 創作者</p>
+                              <p class="text-text-sec font-bold tracking-wider text-sm mt-1">創業導師</p>
+                          </div>
+                       </div>
+                       
+                       <div class="flex-grow space-y-10 w-full">
+                           <div>
+                              <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-3"><i class="ph-fill ph-briefcase text-brand-gold text-xl"></i> 現職 Current</h3>
+                              <ul class="space-y-3 text-text-sec text-base">
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-check-circle text-brand-green mt-1"></i> 龍華科大 數位行銷講師</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-check-circle text-brand-green mt-1"></i> 智策慧 品牌行銷科技顧問</li>
+                              </ul>
+                           </div>
+                           
+                           <div>
+                              <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-3"><i class="ph-fill ph-star text-brand-gold text-xl"></i> 經歷 Experience</h3>
+                              <ul class="space-y-3 text-text-sec text-base">
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-caret-right text-brand-gold mt-1"></i> 脈動心聯股份有限公司 創辦人暨執行長</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-caret-right text-brand-gold mt-1"></i> 宏碁集團建碁 AOPEN 整合營銷處處長 / 全球品牌行銷總監 / 企業發言人</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-caret-right text-brand-gold mt-1"></i> 台灣數位看板多媒體聯盟 (DSMA) 副會長</li>
+                              </ul>
+                           </div>
+
+                           <div>
+                              <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-3"><i class="ph-fill ph-graduation-cap text-brand-gold text-xl"></i> 學歷 Education</h3>
+                              <ul class="space-y-3 text-text-sec text-base">
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-student text-brand-blue mt-1"></i> 台大 EMBA 商學組</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-student text-brand-blue mt-1"></i> 美國 Arizona State University 互動多媒體設計</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-student text-brand-blue mt-1"></i> 北科大 工業設計</li>
+                              </ul>
+                           </div>
+                           
+                           <div>
+                              <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2 border-b border-white/10 pb-3"><i class="ph-fill ph-chalkboard-teacher text-brand-gold text-xl"></i> 專家授課經歷</h3>
+                              <ul class="space-y-3 text-text-sec text-base">
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-presentation-chart text-brand-orange mt-1"></i> CPC 生產力中心 經營管理顧問師班 / 中小企業成長創價能量 講師</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-presentation-chart text-brand-orange mt-1"></i> 台大 EMBA / 長榮 EMBA / 北科大 / 政大 / 世新 業師</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-presentation-chart text-brand-orange mt-1"></i> 2021 MarTech 行銷科技行銷長認證班 講師</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-presentation-chart text-brand-orange mt-1"></i> 2021 / 2024 / 2025 T大使與產業尖兵 講師</li>
+                                  <li class="flex items-start gap-3"><i class="ph-bold ph-presentation-chart text-brand-orange mt-1"></i> 2025 新光人壽 AI 工具應用 企業內訓講師</li>
+                              </ul>
+                           </div>
+                       </div>
+                   </div>
+              </div>
+          </div>`;
       },
 
-      /* --- STREAMING_CHUNK: 後台管理介面 (加入標籤功能) --- */
+      /* --- STREAMING_CHUNK: 後台管理介面 --- */
       renderAdmin: () => {
         if(!State.isAdmin) { $('#app-view').innerHTML = `<div class="py-32 text-center text-red-500 font-bold">權限不足</div>`; return; }
         
         let html = `
           <div class="px-4 sm:px-6 lg:px-10 py-10 max-w-[1500px] mx-auto w-full animate-fade-in">
-            <!-- 上方控制面板 -->
             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-6 mb-12 bg-[#0B1727] p-8 rounded-3xl border border-white/5 shadow-xl">
                <div>
                    <h1 class="text-3xl font-black text-white flex items-center gap-3 mb-2"><i class="ph-fill ph-gear-six text-brand-gold"></i> 內容管理中控台</h1>
@@ -484,7 +522,6 @@
                </div>
             </div>
             
-            <!-- 編輯表單 -->
             <div class="mb-12 p-8 bg-gradient-to-br from-[#0B1727] to-[#040A12] border border-brand-gold/20 rounded-3xl shadow-2xl">
                <h2 class="text-brand-gold font-bold mb-6 flex items-center gap-2 text-xl" id="admin-form-title"><i class="ph-fill ph-youtube-logo text-2xl text-red-500"></i> 新增影音館藏</h2>
                
@@ -501,7 +538,6 @@
                   <div class="md:col-span-1 flex flex-col gap-4">
                      <div class="rounded-xl overflow-hidden bg-black aspect-video border border-white/10 relative">
                         <img id="draft-thumb" src="" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
                      </div>
                      <input type="text" id="draft-tags" placeholder="關鍵字標籤 (以逗號分隔，例: 植物,縮時)" class="w-full bg-[#112240] text-brand-gold px-4 py-3 rounded-xl border border-white/10 focus:border-brand-gold outline-none font-medium text-sm">
                   </div>
@@ -523,7 +559,6 @@
                </div>
             </div>
 
-            <!-- 後台列表 -->
             <div class="bg-[#0B1727] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
               <table class="w-full text-left text-white">
                  <thead class="bg-black/40 text-text-sec text-sm uppercase tracking-wider">
@@ -553,21 +588,17 @@
         $('#app-view').innerHTML = html;
 
         let currentYtId = ''; let isEditingMode = false; let editOriginalVersion = 1;
-
         $('#btn-save-key-top').onclick = () => { const val=$('#input-ai-key').value.trim(); State.aiKey=val; sessionStorage.setItem('gemini_api_key',val); Utils.showToast('Key 儲存成功','success'); };
 
         $('#btn-fetch-yt').onclick = async () => {
-            const url = $('#admin-url').value;
-            currentYtId = Utils.extractYoutubeId(url);
+            const url = $('#admin-url').value; currentYtId = Utils.extractYoutubeId(url);
             if(!currentYtId) return Utils.showToast('無效的 YouTube 網址', 'error');
-            
             const existing = State.videos.find(v => v.id === currentYtId);
             if (existing) { window.editVideo(currentYtId); Utils.showToast('影片已存在，進入編輯模式', 'info'); return; }
 
             isEditingMode = false; editOriginalVersion = 1;
             $('#btn-quick-add').innerHTML = `<i class="ph-bold ph-check text-xl"></i> 3. 儲存新增`;
-            $('#btn-cancel-edit').classList.add('hidden');
-            $('#draft-form').classList.remove('hidden');
+            $('#btn-cancel-edit').classList.add('hidden'); $('#draft-form').classList.remove('hidden');
             $('#draft-thumb').src = `https://img.youtube.com/vi/${currentYtId}/maxresdefault.jpg`;
             $('#draft-thumb').onerror = () => { $('#draft-thumb').src = `https://img.youtube.com/vi/${currentYtId}/hqdefault.jpg`; };
             
@@ -579,83 +610,54 @@
             } catch(e) {} finally { $('#btn-fetch-yt').innerHTML = `<i class="ph-bold ph-link text-xl"></i> 1. 解析`; }
         };
 
-        // 升級：AI 同時產生簡介與關鍵字標籤
         $('#btn-ai-gen').onclick = async () => {
             if(!currentYtId) return Utils.showToast('請先貼上網址並點擊解析', 'error');
             if(!State.aiKey) return $('#apiKey-modal').classList.remove('hidden');
-            
-            const currentTitle = $('#draft-title').value;
-            if(!currentTitle) return Utils.showToast('請先手動輸入標題給 AI 當線索', 'error');
+            const currentTitle = $('#draft-title').value; if(!currentTitle) return Utils.showToast('請先手動輸入標題給 AI', 'error');
 
-            const btn = $('#btn-ai-gen');
-            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i> 產出中...`;
-            
+            const btn = $('#btn-ai-gen'); btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i> 產出中...`;
             try {
-                // 明確要求 JSON 格式包含 tags
                 const prompt = `你是自然生態教育專家。請根據影片標題「${currentTitle}」，用繁體中文撰寫約 80 字的高質感介紹。同時，提供 3~5 個相關關鍵字（以逗號分隔）。
                 請務必只回傳以下 JSON 格式，不要加 Markdown 或其他字：
                 {"description": "影片介紹內容...", "tags": "關鍵字1, 關鍵字2, 關鍵字3"}`;
-                
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent?key=${State.aiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                 });
-                
-                const data = await res.json();
-                if(data.error) throw new Error(data.error.message);
+                const data = await res.json(); if(data.error) throw new Error(data.error.message);
                 
                 let rawText = data.candidates[0].content.parts[0].text.replace(/```json/g, '').replace(/```/g, '').trim();
-                let parsed;
-                try {
-                    parsed = JSON.parse(rawText);
-                } catch(parseErr) {
-                    // Fallback in case AI doesn't format JSON perfectly
-                    parsed = { description: rawText, tags: "AI, 自然, 生態" };
-                }
+                let parsed; try { parsed = JSON.parse(rawText); } catch(parseErr) { parsed = { description: rawText, tags: "AI, 自然, 生態" }; }
                 
-                $('#draft-desc').value = parsed.description || '';
-                $('#draft-tags').value = parsed.tags || '';
+                $('#draft-desc').value = parsed.description || ''; $('#draft-tags').value = parsed.tags || '';
                 Utils.showToast('AI 生成完成！', 'success');
-            } catch (e) {
-                Utils.showToast(`產出失敗：${e.message}`, 'error');
-            } finally {
-                btn.innerHTML = `<i class="ph-fill ph-sparkle text-xl"></i> 2. AI 自動生成`;
-            }
+            } catch (e) { Utils.showToast(`產出失敗：${e.message}`, 'error'); } finally { btn.innerHTML = `<i class="ph-fill ph-sparkle text-xl"></i> 2. AI 自動生成`; }
         };
 
         $('#btn-quick-add').onclick = async () => {
             if(!currentYtId) return Utils.showToast('請先解析 YouTube 網址', 'error');
-            const title = $('#draft-title').value;
-            if(!title) return Utils.showToast('標題不能為空', 'error');
+            const title = $('#draft-title').value; if(!title) return Utils.showToast('標題不能為空', 'error');
             
             $('#btn-quick-add').innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i> 儲存中...`;
             try {
                 const payload = {
-                    youtubeId: currentYtId, titleZh: title,
-                    fullDescription: $('#draft-desc').value || '',
-                    tags: $('#draft-tags').value || '',
-                    status: $('#draft-status').value, seriesId: $('#draft-series').value, 
-                    thumbnailUrl: $('#draft-thumb').src,
+                    youtubeId: currentYtId, titleZh: title, fullDescription: $('#draft-desc').value || '', tags: $('#draft-tags').value || '',
+                    status: $('#draft-status').value, seriesId: $('#draft-series').value, thumbnailUrl: $('#draft-thumb').src,
                     version: isEditingMode ? editOriginalVersion + 1 : 1, updatedAt: serverTimestamp()
                 };
                 if (!isEditingMode) payload.createdAt = serverTimestamp();
-                
                 await setDoc(doc(db, 'videos', currentYtId), payload, { merge: true });
-                Utils.showToast('儲存成功！', 'success');
-                resetForm();
-            } catch(e) { Utils.showToast(`寫入失敗：${e.message}`, 'error'); } 
-            finally { $('#btn-quick-add').innerHTML = `<i class="ph-bold ph-check text-xl"></i> 3. 儲存`; }
+                Utils.showToast('儲存成功！', 'success'); resetForm();
+            } catch(e) { Utils.showToast(`寫入失敗：${e.message}`, 'error'); } finally { $('#btn-quick-add').innerHTML = `<i class="ph-bold ph-check text-xl"></i> 3. 儲存`; }
         };
 
         const resetForm = () => { $('#admin-url').value = ''; $('#draft-title').value = ''; $('#draft-desc').value = ''; $('#draft-tags').value = ''; $('#draft-form').classList.add('hidden'); $('#btn-cancel-edit').classList.add('hidden'); currentYtId = ''; isEditingMode = false; };
         $('#btn-cancel-edit').onclick = resetForm;
-
         window.editVideo = (id) => {
             const v = State.videos.find(x => x.id === id); if(!v) return;
             currentYtId = v.id; isEditingMode = true; editOriginalVersion = v.version || 1;
             $('#admin-url').value = `https://youtu.be/${v.id}`;
-            $('#draft-title').value = v.titleZh || ''; $('#draft-desc').value = v.fullDescription || '';
-            $('#draft-tags').value = v.tags || '';
+            $('#draft-title').value = v.titleZh || ''; $('#draft-desc').value = v.fullDescription || ''; $('#draft-tags').value = v.tags || '';
             $('#draft-series').value = v.seriesId; $('#draft-status').value = v.status;
             $('#draft-thumb').src = v.thumbnailUrl || `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
             $('#btn-quick-add').innerHTML = `<i class="ph-bold ph-check text-xl"></i> 3. 儲存變更`;
@@ -665,89 +667,57 @@
       }
     };
 
-    /* --- STREAMING_CHUNK: 影片播放器全域函數 --- */
+    /* --- STREAMING_CHUNK: 主播放器 --- */
     window.openVideo = (id) => {
        const v = State.videos.find(x => x.id === id); if(!v) return;
        const m = $('#video-modal'), box = $('#video-box');
        const currentOrigin = window.location.origin !== 'null' ? window.location.origin : 'https://tony-video-blog.web.app';
-       $('#yt-iframe').src = `https://www.youtube.com/embed/${v.id}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(currentOrigin)}`;
+       $('#yt-iframe').src = `https://www.youtube.com/embed/${v.id}?autoplay=1&loop=1&playlist=${v.id}&rel=0&enablejsapi=1&origin=${encodeURIComponent(currentOrigin)}`;
        $('#yt-fallback-link').href = `https://www.youtube.com/watch?v=${v.id}`;
        $('#player-title').innerText = v.titleZh; $('#player-title-full').innerText = v.titleZh;
        $('#player-desc').innerText = v.fullDescription || '尚無摘要資訊。';
        $('#player-series').innerText = SERIES_MAP[v.seriesId]?.name || '未分類';
        $('#player-date').innerText = v.createdAt ? new Date(v.createdAt.seconds * 1000).toLocaleDateString() : '剛剛';
        
-       // 顯示關鍵字標籤
-       const tagsContainer = $('#player-tags');
-       tagsContainer.innerHTML = '';
-       if(v.tags) {
-           v.tags.split(',').map(t => t.trim()).filter(Boolean).forEach(tag => {
-               tagsContainer.innerHTML += `<span class="px-2.5 py-1 bg-white/10 text-white rounded font-medium text-xs border border-white/20"><i class="ph ph-hash"></i> ${tag}</span>`;
-           });
-       }
-
+       const tagsContainer = $('#player-tags'); tagsContainer.innerHTML = '';
+       if(v.tags) { v.tags.split(',').map(t => t.trim()).filter(Boolean).forEach(tag => { tagsContainer.innerHTML += `<span class="px-2.5 py-1 bg-white/10 text-white rounded font-medium text-xs border border-white/20"><i class="ph ph-hash"></i> ${tag}</span>`; }); }
        document.body.style.overflow = 'hidden'; m.classList.remove('hidden');
        requestAnimationFrame(() => { m.classList.remove('opacity-0'); box.classList.remove('scale-95'); });
     };
     $('#btn-close-video').onclick = () => { const m = $('#video-modal'), box = $('#video-box'); box.classList.add('scale-95'); m.classList.add('opacity-0'); setTimeout(() => { m.classList.add('hidden'); $('#yt-iframe').src = ''; document.body.style.overflow = ''; }, 300); };
 
-    /* --- STREAMING_CHUNK: 路由控制與搜尋邏輯 --- */
+    /* --- STREAMING_CHUNK: 路由與事件綁定 --- */
     const Router = {
       navigate: (hash) => {
-        if (!hash) hash = '#/home';
-        State.currentRoute = hash;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+        if (!hash) hash = '#/home'; State.currentRoute = hash; window.scrollTo({ top: 0, behavior: 'smooth' });
         if (hash === '#/about') { Views.renderAbout(); return; }
         if (State.isInitialAuthResolved) DataService.loadVideos();
       }
     };
     window.addEventListener('hashchange', () => Router.navigate(window.location.hash));
 
-    // 搜尋功能處理
     const handleSearch = (e) => {
         State.searchQuery = e.target.value.trim();
         if(State.searchQuery) {
             $('#btn-clear-search').classList.remove('hidden');
             if(State.currentRoute !== '#/home' && State.currentRoute !== '#/explore') Router.navigate('#/home');
-            else Views.renderCurrentRoute(); // 觸發重繪
+            else Views.renderCurrentRoute();
         } else {
-            $('#btn-clear-search').classList.add('hidden');
-            Views.renderCurrentRoute();
+            $('#btn-clear-search').classList.add('hidden'); Views.renderCurrentRoute();
         }
     };
     $('#global-search').addEventListener('input', handleSearch);
-    
-    /* --- STREAMING_CHUNK: 行動版選單與搜尋同步邏輯 --- */
-    $('#mobile-global-search').addEventListener('input', (e) => {
-        $('#global-search').value = e.target.value;
-        handleSearch(e);
-    });
-
-    window.clearSearch = () => { 
-        State.searchQuery = ''; 
-        $('#global-search').value = ''; 
-        $('#mobile-global-search').value = ''; 
-        $('#btn-clear-search').classList.add('hidden'); 
-        Views.renderCurrentRoute(); 
-    };
+    $('#mobile-global-search').addEventListener('input', (e) => { $('#global-search').value = e.target.value; handleSearch(e); });
+    window.clearSearch = () => { State.searchQuery = ''; $('#global-search').value = ''; $('#mobile-global-search').value = ''; $('#btn-clear-search').classList.add('hidden'); Views.renderCurrentRoute(); };
     $('#btn-clear-search').onclick = window.clearSearch;
 
-    // 行動版選單開關
     $('#btn-mobile-menu').onclick = () => $('#mobile-menu').classList.remove('-translate-x-full');
     $('#btn-close-mobile').onclick = () => $('#mobile-menu').classList.add('-translate-x-full');
-    document.querySelectorAll('.mobile-nav-link').forEach(link => {
-        link.onclick = () => {
-            $('#mobile-menu').classList.add('-translate-x-full');
-            window.clearSearch();
-        };
-    });
+    document.querySelectorAll('.mobile-nav-link').forEach(link => { link.onclick = () => { $('#mobile-menu').classList.add('-translate-x-full'); window.clearSearch(); }; });
 
-    /* --- STREAMING_CHUNK: 應用程式啟動入口 --- */
     $('#btn-close-apiKey').onclick = () => { $('#apiKey-modal').classList.add('opacity-0'); setTimeout(()=>$('#apiKey-modal').classList.add('hidden'), 200); };
     $('#btn-save-apiKey').onclick = () => { const val = $('#input-modal-apikey').value.trim(); if(val) { State.aiKey = val; sessionStorage.setItem('gemini_api_key', val); $('#btn-close-apiKey').click(); Utils.showToast('Key 套用成功', 'success'); } };
 
-    // 登入互動綁定
     const toggleLogin = (s) => { const m=$('#login-modal'), b=$('#login-box'); if(s) { m.classList.remove('hidden'); requestAnimationFrame(()=> { m.classList.remove('opacity-0'); b.classList.remove('scale-95'); }); } else { b.classList.add('scale-95'); m.classList.add('opacity-0'); setTimeout(()=>m.classList.add('hidden'), 200); } };
     $('#btn-login').onclick = () => toggleLogin(true); $('#btn-close-login').onclick = () => toggleLogin(false);
     $('#btn-google-login').onclick = async () => { try { await signInWithPopup(auth, new GoogleAuthProvider()); toggleLogin(false); } catch(e) { Utils.showToast('彈窗遭阻擋，請使用一般登入', 'error'); } };
@@ -756,13 +726,9 @@
     $('#btn-logout').onclick = () => { signOut(auth); Utils.showToast('已登出'); };
 
     window.addEventListener('DOMContentLoaded', () => {
-        // [強制解鎖安全閥] 確保 3.5 秒後不管 Auth/DB 狀態如何，強制解除「載入中」畫面
         setTimeout(() => {
             if (!State.isInitialAuthResolved) {
-                console.warn("驗證系統無回應，啟動緊急解鎖");
-                State.isInitialAuthResolved = true;
-                $('#loading-indicator').style.display = 'none';
-                Router.navigate(window.location.hash || '#/home');
+                State.isInitialAuthResolved = true; $('#loading-indicator').style.display = 'none'; Router.navigate(window.location.hash || '#/home');
             }
         }, 3500);
 
@@ -775,25 +741,17 @@
                 $('#user-name').innerText = user.displayName || (State.isAdmin ? '管理員' : '測試會員');
                 $('#user-email').innerText = user.email || `ID: ${user.uid.slice(0,6)}...`;
                 $('#link-admin').style.display = State.isAdmin ? 'flex' : 'none';
-                $('#link-admin-mobile').style.display = State.isAdmin ? 'flex' : 'none'; // 同步顯示行動版後台入口
+                $('#link-admin-mobile').style.display = State.isAdmin ? 'flex' : 'none';
               } else {
                 $('#btn-login').classList.remove('hidden'); $('#user-profile-menu').classList.add('hidden');
                 $('#link-admin-mobile').style.display = 'none';
                 if(State.currentRoute === '#/admin') Router.navigate('#/home');
               }
-              
-              if (!State.isInitialAuthResolved) {
-                 State.isInitialAuthResolved = true;
-                 Router.navigate(window.location.hash || '#/home');
-              } else {
-                 DataService.loadVideos();
-              }
+              if (!State.isInitialAuthResolved) { State.isInitialAuthResolved = true; Router.navigate(window.location.hash || '#/home'); } 
+              else { DataService.loadVideos(); }
             });
-        } catch (error) {
-            console.error("Auth Init Error:", error);
-        }
+        } catch (error) { console.error("Auth Init Error:", error); }
     });
-
   </script>
 </body>
 </html>
