@@ -701,7 +701,11 @@
                    playerVars: { 'autoplay': 1, 'loop': 1, 'playlist': v.id, 'rel': 0, 'origin': currentOrigin },
                    events: {
                        'onReady': (event) => { event.target.setPlaybackQuality('hd1080'); },
-                       'onStateChange': (event) => { if (event.data === YT.PlayerState.PLAYING) event.target.setPlaybackQuality('hd1080'); }
+                       'onStateChange': (event) => { 
+                           if (event.data === YT.PlayerState.PLAYING) event.target.setPlaybackQuality('hd1080'); 
+                           // 【修正】：監聽影片結束事件，一旦結束強制重播，確保二次載入影片時不遺失循環設定
+                           if (event.data === YT.PlayerState.ENDED) event.target.playVideo();
+                       }
                    }
                });
            } else {
