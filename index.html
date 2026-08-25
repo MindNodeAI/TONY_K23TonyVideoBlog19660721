@@ -170,7 +170,9 @@
                  <i class="ph-bold ph-arrow-square-out"></i> 前往 YouTube 觀看
              </a>
           </div>
-          <iframe id="yt-iframe" class="w-full h-full absolute inset-0 z-10" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div class="w-full h-full absolute inset-0 z-10">
+              <div id="yt-player-container"></div>
+          </div>
         </div>
         <div class="w-full lg:w-1/3 xl:w-1/4 bg-[#0B1727] p-6 lg:p-8 lg:overflow-y-auto border-t lg:border-t-0 lg:border-l border-white/5 shrink-0">
           <div class="flex flex-wrap items-center gap-2 mb-4">
@@ -668,11 +670,18 @@
     };
 
     /* --- STREAMING_CHUNK: 主播放器 --- */
+    let ytPlayer = null;
+    
+    // 非同步載入 YouTube IFrame API 以支援強制畫質設定
+    const ytScript = document.createElement('script');
+    ytScript.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(ytScript);
+
     window.openVideo = (id) => {
        const v = State.videos.find(x => x.id === id); if(!v) return;
        const m = $('#video-modal'), box = $('#video-box');
        const currentOrigin = window.location.origin !== 'null' ? window.location.origin : 'https://tony-video-blog.web.app';
-       $('#yt-iframe').src = `https://www.youtube.com/embed/${v.id}?autoplay=1&loop=1&playlist=${v.id}&rel=0&enablejsapi=1&origin=${encodeURIComponent(currentOrigin)}`;
+       
        $('#yt-fallback-link').href = `https://www.youtube.com/watch?v=${v.id}`;
        $('#player-title').innerText = v.titleZh; $('#player-title-full').innerText = v.titleZh;
        $('#player-desc').innerText = v.fullDescription || '尚無摘要資訊。';
@@ -683,8 +692,36 @@
        if(v.tags) { v.tags.split(',').map(t => t.trim()).filter(Boolean).forEach(tag => { tagsContainer.innerHTML += `<span class="px-2.5 py-1 bg-white/10 text-white rounded font-medium text-xs border border-white/20"><i class="ph ph-hash"></i> ${tag}</span>`; }); }
        document.body.style.overflow = 'hidden'; m.classList.remove('hidden');
        requestAnimationFrame(() => { m.classList.remove('opacity-0'); box.classList.remove('scale-95'); });
+
+       // 使用 YouTube JS API 初始化，並強制要求 1080P
+       const initPlayer = () => {
+           if (!ytPlayer) {
+               ytPlayer = new YT.Player('yt-player-container', {
+                   height: '100%', width: '100%', videoId: v.id,
+                   playerVars: { 'autoplay': 1, 'loop': 1, 'playlist': v.id, 'rel': 0, 'origin': currentOrigin },
+                   events: {
+                       'onReady': (event) => { event.target.setPlaybackQuality('hd1080'); },
+                       'onStateChange': (event) => { if (event.data === YT.PlayerState.PLAYING) event.target.setPlaybackQuality('hd1080'); }
+                   }
+               });
+           } else {
+               ytPlayer.loadVideoById({ videoId: v.id, suggestedQuality: 'hd1080' });
+           }
+       };
+
+       if (typeof YT !== 'undefined' && YT.Player) initPlayer();
+       else window.onYouTubeIframeAPIReady = initPlayer;
     };
-    $('#btn-close-video').onclick = () => { const m = $('#video-modal'), box = $('#video-box'); box.classList.add('scale-95'); m.classList.add('opacity-0'); setTimeout(() => { m.classList.add('hidden'); $('#yt-iframe').src = ''; document.body.style.overflow = ''; }, 300); };
+    
+    $('#btn-close-video').onclick = () => { 
+        const m = $('#video-modal'), box = $('#video-box'); 
+        box.classList.add('scale-95'); m.classList.add('opacity-0'); 
+        setTimeout(() => { 
+            m.classList.add('hidden'); 
+            if(ytPlayer && typeof ytPlayer.stopVideo === 'function') ytPlayer.stopVideo(); 
+            document.body.style.overflow = ''; 
+        }, 300); 
+    };
 
     /* --- STREAMING_CHUNK: 路由與事件綁定 --- */
     const Router = {
