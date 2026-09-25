@@ -90,7 +90,7 @@
         </a>
         <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-text-sec">
           <a href="#/home" class="hover:text-brand-gold transition-colors">首頁</a>
-          <a href="#/explore" class="hover:text-brand-gold transition-colors">六大系列</a>
+          <a href="#/explore" class="hover:text-brand-gold transition-colors">七大系列</a>
           <a href="#/about" class="hover:text-brand-gold transition-colors">TONY 顧問</a>
         </nav>
       </div>
@@ -141,7 +141,7 @@
           </div>
           <div class="flex-grow flex flex-col py-2">
               <a href="#/home" class="px-6 py-3 text-white hover:bg-white/5 hover:text-brand-gold transition-colors font-medium">首頁</a>
-              <a href="#/explore" class="px-6 py-3 text-white hover:bg-white/5 hover:text-brand-gold transition-colors font-medium">六大系列</a>
+              <a href="#/explore" class="px-6 py-3 text-white hover:bg-white/5 hover:text-brand-gold transition-colors font-medium">七大系列</a>
               <a href="#/about" class="px-6 py-3 text-white hover:bg-white/5 hover:text-brand-gold transition-colors font-medium">TONY 顧問</a>
           </div>
       </div>
@@ -284,14 +284,15 @@
       currentRoute: ''
     };
 
-    // 精準設定規格書六大分類
+    // 精準設定規格書七大分類
     const SERIES_MAP = {
       'plant-timelapse': '植物花果生命縮時導演',
       'eco-documentary': '昆蟲兩棲生命蛻變導演',
       'life-cycle': '動物鳥類生命成長導演',
       'expert-talks': '海洋魚類生命導演',
-      'taiwan-endangered': '台灣瀕危生命 100',
-      'chinese-poetry': '中國詩詞歌賦系列'
+      'taiwan-endangered': '瀕危生命 100',
+      'chinese-poetry': '中國詩詞歌賦系列',
+      'mv-music': 'MV音樂創作系列'
     };
     
     // 各系列專屬簡介 (探索頁面使用)
@@ -300,8 +301,9 @@
         'eco-documentary': '昆蟲兩棲生命蛻變導演',
         'life-cycle': '深入觀察動物與鳥類如何破殼而出、成長茁壯，感受生命的堅韌。',
         'expert-talks': '潛入深藍海域，記錄豐富魚類與海洋生物的生態循環與絕美姿態。',
-        'taiwan-endangered': '珍貴紀錄台灣特有且瀕臨絕種的生命軌跡，呼籲生態保育的重要性。',
-        'chinese-poetry': '結合絕美視覺與古典文學，透過影像重新詮釋傳統詩詞歌賦的深遠意境與雋永之美。'
+        'taiwan-endangered': '珍貴紀錄瀕危與稀有生命的軌跡，呼籲生態保育的重要性。',
+        'chinese-poetry': '結合絕美視覺與古典文學，透過影像重新詮釋傳統詩詞歌賦的深遠意境與雋永之美。',
+        'mv-music': '結合原創音樂與視覺影像，打造觸動人心的音樂故事與藝術創作。'
     };
 
     // 用於展示的預設假資料 (當 Firebase 權限不足時載入)
@@ -720,7 +722,7 @@
           <div class="px-4 sm:px-6 lg:px-12 py-12 max-w-[1600px] mx-auto w-full animate-fade-in">
             <div class="text-center mb-10">
                <span class="inline-block py-1 px-3 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-sm font-bold tracking-widest mb-4">CATEGORIES</span>
-               <h1 class="text-4xl md:text-5xl font-black text-white mb-4">探索六大系列</h1>
+               <h1 class="text-4xl md:text-5xl font-black text-white mb-4">探索七大系列</h1>
                <p class="text-text-sec text-lg max-w-2xl mx-auto">依照不同生態主題分類，深入體驗每一個生命奇蹟的瞬間。</p>
             </div>
             
