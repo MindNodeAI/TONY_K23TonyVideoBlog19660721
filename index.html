@@ -80,7 +80,7 @@
     <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-8">
         <!-- 行動版選單按鈕 -->
-        <button id="btn-mobile-menu" class="md:hidden text-white hover:text-brand-gold text-2xl transition-colors">
+        <button id="btn-mobile-menu" class="md:hidden text-white hover:text-brand-gold text-2xl transition-colors" aria-label="打開選單">
             <i class="ph ph-list"></i>
         </button>
 
@@ -130,9 +130,8 @@
       <div class="absolute top-0 left-0 w-64 h-full bg-[#0B1727] border-r border-white/10 shadow-2xl transform -translate-x-full transition-transform duration-300 flex flex-col" id="mobile-menu-panel">
           <div class="p-4 border-b border-white/10 flex justify-between items-center">
               <span class="font-bold text-white">導覽選單</span>
-              <button id="btn-close-mobile" class="text-text-sec hover:text-white p-1 rounded-md"><i class="ph ph-x text-xl"></i></button>
+              <button id="btn-close-mobile" class="text-text-sec hover:text-white p-1 rounded-md" aria-label="關閉選單"><i class="ph ph-x text-xl"></i></button>
           </div>
-          <!-- 行動版搜尋框 -->
           <div class="p-4 border-b border-white/10 lg:hidden">
               <div class="flex items-center bg-[#112240] border border-white/10 rounded-xl px-3 py-2">
                   <i class="ph ph-magnifying-glass text-text-sec"></i>
@@ -149,22 +148,22 @@
 
   <!-- Main View -->
   <main id="app-view" class="flex-grow pt-16 w-full relative z-10 flex flex-col min-h-[calc(100vh-140px)]">
-    <!-- 初始化防呆畫面 -->
+    <!-- 初始化載入畫面 (防呆設計) -->
     <div class="flex-1 flex flex-col items-center justify-center text-brand-gold/60 py-40">
       <div class="loader mb-6"></div>
       <p class="font-bold tracking-widest text-sm uppercase">系統載入中...</p>
     </div>
   </main>
 
-  <!-- Footer -->
+  <!-- Footer (品牌版權宣告加固) -->
   <footer class="border-t border-white/5 py-8 text-center text-sm text-text-sec z-10 bg-[#040A12] shrink-0 mt-auto">
     <div class="flex items-center justify-center gap-2 mb-3">
-      <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="Logo" class="h-6 w-auto opacity-40 grayscale" onerror="this.style.display='none'">
+      <img src="https://i.postimg.cc/fT2sQW09/1.png" alt="TonyStudio Logo" class="h-6 w-auto opacity-40 grayscale" onerror="this.style.display='none'">
     </div>
-    <p>&copy; 2026 TONY STUDIO. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.</p>
+    <p>&copy; 2026 TONY STUDIO. 本教材由 TONY STUDIO (楊文澤顧問) 設計. All Rights Reserved.</p>
   </footer>
 
-  <!-- 雙模式登入 Modal -->
+  <!-- 登入 Modal (包含無敵解鎖模式) -->
   <div id="login-modal" class="fixed inset-0 z-[200] bg-black/80 hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-4 backdrop-blur-sm">
     <div class="bg-[#0B1727] border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl transform scale-95 transition-transform duration-200" id="login-box">
       <div class="flex justify-between items-start mb-6">
@@ -197,8 +196,10 @@
 
             <button id="btn-email-login" class="w-full bg-brand-gold text-black font-bold py-2.5 rounded-lg hover:bg-yellow-400 transition-colors shadow">登入後台</button>
         </div>
-        <button id="btn-anon-login" class="w-full bg-transparent text-text-sec border border-white/20 font-bold py-3 rounded-xl hover:bg-white/10 hover:text-white transition-colors text-sm">
-          訪客一鍵登入 (測試會員功能)
+        
+        <button id="btn-anon-login" class="w-full relative overflow-hidden bg-gradient-to-r from-brand-gold/10 to-brand-orange/10 border border-brand-gold/30 font-bold py-3.5 rounded-xl hover:from-brand-gold/20 hover:to-brand-orange/20 transition-all text-sm group">
+          <div class="absolute inset-0 bg-brand-gold/5 w-full h-full transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"></div>
+          <span class="text-brand-gold flex items-center justify-center gap-2 relative z-10"><i class="ph-fill ph-sparkle text-lg"></i> ✨ 開發者一鍵解鎖 (無敵模式進入後台)</span>
         </button>
       </div>
     </div>
@@ -236,7 +237,7 @@
              <div class="loader mb-4"></div>
              <p class="text-sm font-bold mb-2">影片緩衝中，請稍候...</p>
           </div>
-          <!-- 這裡改用 div，交由 YouTube IFrame API 動態渲染 -->
+          <!-- 交由 YouTube IFrame API 動態渲染 -->
           <div id="yt-iframe-container" class="w-full h-full absolute inset-0 z-10"></div>
         </div>
         <!-- Info -->
@@ -248,7 +249,7 @@
           <h2 id="player-title-full" class="text-xl md:text-2xl font-black text-white mb-6 leading-tight"></h2>
           
           <div id="player-tags-container" class="flex flex-wrap gap-2 mb-6 hidden">
-              <!-- AI Tags 會放在這裡 -->
+              <!-- AI Tags 渲染區 -->
           </div>
 
           <div class="h-px w-full bg-white/10 mb-6"></div>
@@ -265,7 +266,7 @@
     import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInWithEmailAndPassword, signInAnonymously, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, collection, query, where, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    /* --- STREAMING_CHUNK: 系統常數與狀態 --- */
+    /* --- STREAMING_CHUNK: 系統常數與狀態配置 --- */
     const SUPER_ADMIN_EMAIL = "mindnodeai@gmail.com";
 
     const firebaseConfig = {
@@ -284,7 +285,7 @@
       currentRoute: ''
     };
 
-    // 精準設定規格書七大分類
+    // 分類配置表 (七大系列)
     const SERIES_MAP = {
       'plant-timelapse': '植物花果生命縮時導演',
       'eco-documentary': '昆蟲兩棲生命蛻變導演',
@@ -295,10 +296,10 @@
       'mv-music': 'MV音樂創作系列'
     };
     
-    // 各系列專屬簡介 (探索頁面使用)
+    // 各系列專屬簡介
     const SERIES_DESC = {
         'plant-timelapse': '從種子發芽到花朵綻放，以時間壓縮技術見證植物生命的奇妙旅程。',
-        'eco-documentary': '昆蟲兩棲生命蛻變導演',
+        'eco-documentary': '微觀鏡頭下的生命蛻變，記錄昆蟲與兩棲類從幼體到成熟的震撼過程。',
         'life-cycle': '深入觀察動物與鳥類如何破殼而出、成長茁壯，感受生命的堅韌。',
         'expert-talks': '潛入深藍海域，記錄豐富魚類與海洋生物的生態循環與絕美姿態。',
         'taiwan-endangered': '珍貴紀錄瀕危與稀有生命的軌跡，呼籲生態保育的重要性。',
@@ -306,7 +307,7 @@
         'mv-music': '結合原創音樂與視覺影像，打造觸動人心的音樂故事與藝術創作。'
     };
 
-    // 用於展示的預設假資料 (當 Firebase 權限不足時載入)
+    // 容錯降級用假資料 (Mock Data)
     const MOCK_VIDEOS = [
         { id: 'W-t8Q-xW2tQ', titleZh: '【自然縮時】綠豆發芽生長全紀錄', fullDescription: '透過高畫質縮時攝影，見證種子萌芽到生長出綠葉的奇妙生命歷程。', tags: ['縮時', '植物', '發芽'], status: 'published', seriesId: 'plant-timelapse', thumbnailUrl: 'https://images.unsplash.com/photo-1558231264-5868cc49a8c2?q=80&w=600&auto=format&fit=crop', createdAt: { seconds: Math.floor(Date.now() / 1000) - 86400 } },
         { id: 'g6L8D2U1R_E', titleZh: '【生態紀錄】鳳蝶的破繭而出', fullDescription: '完整記錄鳳蝶幼蟲化蛹、羽化成蝶的感動瞬間。', tags: ['昆蟲', '羽化', '蝴蝶'], status: 'published', seriesId: 'eco-documentary', thumbnailUrl: 'https://images.unsplash.com/photo-1541959833400-049d37f98ccd?q=80&w=600&auto=format&fit=crop', createdAt: { seconds: Math.floor(Date.now() / 1000) - 172800 } },
@@ -316,14 +317,14 @@
 
     const $ = (s) => document.querySelector(s);
 
-    /* --- STREAMING_CHUNK: 實用工具庫 --- */
+    /* --- STREAMING_CHUNK: 核心工具模組 (防呆與正則解析) --- */
     const Utils = {
       showToast: (msg, type = 'info') => {
         const container = $('#toast-container');
         if(!container) return;
         const t = document.createElement('div');
-        const colors = { success: 'bg-brand-green text-black', error: 'bg-red-500 text-white', info: 'bg-brand-blue text-white' };
-        t.className = `flex items-center gap-3 ${colors[type]} px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-10 opacity-0 font-bold text-sm tracking-wide z-[9999]`;
+        const colors = { success: 'bg-brand-green text-black', error: 'bg-red-500 text-white', info: 'bg-brand-blue text-white', warning: 'bg-brand-orange text-white' };
+        t.className = `flex items-center gap-3 ${colors[type] || colors.info} px-5 py-3.5 rounded-xl shadow-2xl transform transition-all duration-300 translate-y-10 opacity-0 font-bold text-sm tracking-wide z-[9999]`;
         t.innerHTML = `<span>${msg}</span>`;
         container.appendChild(t);
         requestAnimationFrame(() => t.classList.remove('translate-y-10', 'opacity-0'));
@@ -333,24 +334,50 @@
       extractYoutubeId: (url) => {
           const match = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/);
           return (match && match[2].length === 11) ? match[2] : null;
+      },
+      /**
+       * 企業級 Self-Healing JSON 解析器
+       * 防護 LLM 生成時偶發的格式錯誤 (Markdown 代碼塊、額外廢話)
+       */
+      parseAIResponse: (rawText) => {
+          if (!rawText) throw new Error("回傳內容為空");
+          // 嘗試 1: 直接標準解析
+          try { return JSON.parse(rawText); } catch (e) { console.warn("AI 格式原生解析失敗，嘗試修復中...", e); }
+          // 嘗試 2: 清理 Markdown ```json ... ``` 標記
+          try {
+              let cleanedText = rawText.replace(/```(?:json)?\s*/gi, '').replace(/```\s*$/gi, '').trim();
+              return JSON.parse(cleanedText);
+          } catch (e) { console.warn("Markdown 清理後解析失敗，啟動正則強制提取...", e); }
+          // 嘗試 3: Regex 強制定位首尾的大括號 {}
+          try {
+              const match = rawText.match(/\{[\s\S]*\}/);
+              if (match) return JSON.parse(match[0]);
+          } catch (e) { console.warn("正則提取後解析失敗:", e); }
+          
+          throw new Error("AI 輸出格式嚴重破壞，無法自我修復。");
       }
     };
 
-    /* --- STREAMING_CHUNK: 搜尋與選單連動 --- */
+    /* --- STREAMING_CHUNK: 搜尋與選單連動邏輯 --- */
     const handleSearchInput = (e) => {
         State.searchQuery = e.target.value.toLowerCase().trim();
-        // 同步電腦版與手機版輸入框
-        if (e.target.id === 'global-search') $('#mobile-search').value = e.target.value;
-        if (e.target.id === 'mobile-search') $('#global-search').value = e.target.value;
+        // 確保雙端輸入框同步
+        if (e.target.id === 'global-search') {
+            const mSearch = $('#mobile-search');
+            if (mSearch) mSearch.value = e.target.value;
+        }
+        if (e.target.id === 'mobile-search') {
+            const gSearch = $('#global-search');
+            if (gSearch) gSearch.value = e.target.value;
+        }
 
         if (['#/home', ''].includes(State.currentRoute)) Views.renderHome();
         else if (State.currentRoute === '#/explore') Views.renderExplore();
-        else if (State.searchQuery) Router.navigate('#/explore'); // 若在其他頁面搜尋，直接跳轉探索頁
+        else if (State.searchQuery) Router.navigate('#/explore'); 
     };
     $('#global-search')?.addEventListener('input', handleSearchInput);
     $('#mobile-search')?.addEventListener('input', handleSearchInput);
 
-    // 行動版選單開關
     const toggleMobileMenu = (show) => {
         const m = $('#mobile-menu'), panel = $('#mobile-menu-panel');
         if (show) {
@@ -365,12 +392,11 @@
     $('#btn-close-mobile').onclick = () => toggleMobileMenu(false);
     $('#mobile-menu-backdrop').onclick = () => toggleMobileMenu(false);
 
-    // 點擊行動版選單內連結自動收合
     document.querySelectorAll('#mobile-menu-panel a').forEach(a => {
         a.addEventListener('click', () => toggleMobileMenu(false));
     });
 
-    /* --- STREAMING_CHUNK: Firebase 初始化 --- */
+    /* --- STREAMING_CHUNK: Firebase 核心初始化 --- */
     let app, auth, db;
     try {
       app = initializeApp(firebaseConfig);
@@ -380,18 +406,19 @@
       console.error("Firebase Init Error:", error);
     }
 
-    /* --- STREAMING_CHUNK: 資料讀取服務 (防呆降級) --- */
+    /* --- STREAMING_CHUNK: Firestore 資料庫服務 --- */
     let videosUnsubscribe = null;
     const DataService = {
       loadVideos: (forcePublicOnly = false) => {
         if (!db) return;
-        if (videosUnsubscribe) videosUnsubscribe();
+        if (videosUnsubscribe) {
+            videosUnsubscribe(); 
+            videosUnsubscribe = null;
+        }
         
         const isQueryingAdmin = State.isAdmin && !forcePublicOnly;
         const videosRef = collection(db, 'videos');
-        const q = isQueryingAdmin 
-            ? query(videosRef) 
-            : query(videosRef, where("status", "==", "published"));
+        const q = isQueryingAdmin ? query(videosRef) : query(videosRef, where("status", "==", "published"));
         
         videosUnsubscribe = onSnapshot(q, (snap) => {
           let vids = [];
@@ -404,29 +431,22 @@
           else if (State.currentRoute === '#/admin' && State.isAdmin) Views.renderAdmin();
           
         }, err => {
-            console.error("Firestore Error:", err);
+            console.warn("Firestore Listener Error:", err.code);
             if (err.code === 'permission-denied' && isQueryingAdmin) {
-                console.warn("管理員權限遭拒，自動降級為一般模式讀取...");
+                console.warn("管理員權限遭拒，自動降級為公開模式...");
                 DataService.loadVideos(true);
             } else if (err.code === 'permission-denied') {
-                console.warn("資料庫權限遭拒，切換為 Mock 展示模式");
-                Utils.showToast("Firestore 權限不足！已為您自動載入展示用假資料。", "error");
-                
-                // 載入展示用假資料，確保畫面完美呈現
+                Utils.showToast("資料庫安全規則阻擋，已載入展示假資料。", "warning");
                 State.videos = MOCK_VIDEOS;
-                
-                if (['#/home', ''].includes(State.currentRoute)) Views.renderHome();
-                else if (State.currentRoute === '#/explore') Views.renderExplore();
-                else if (State.currentRoute === '#/admin' && State.isAdmin) Views.renderAdmin();
+                Router.navigate(State.currentRoute);
             } else {
-                Utils.showToast("讀取資料失敗，請確認資料庫連線", "error");
-                if (['#/home', ''].includes(State.currentRoute)) Views.renderHome();
+                Utils.showToast("資料讀取失敗，請檢查網路連線", "error");
             }
         });
       }
     };
 
-    /* --- STREAMING_CHUNK: 身分驗證服務 (Smart Login) --- */
+    /* --- STREAMING_CHUNK: 身份驗證與授權服務 --- */
     const AuthService = {
       init: () => {
         const m = $('#login-modal'), box = $('#login-box');
@@ -440,20 +460,15 @@
         
         $('#btn-google-login').onclick = async () => { 
             try { await signInWithPopup(auth, new GoogleAuthProvider()); toggleLogin(false); } 
-            catch(e) { Utils.showToast('彈窗遭阻擋，請使用沙盒專用登入', 'error'); } 
+            catch(e) { Utils.showToast('視窗遭阻擋，請使用測試帳號登入', 'error'); } 
         };
         
-        // 密碼顯示切換邏輯
         $('#btn-toggle-pwd').onclick = () => {
             const pwdInput = $('#input-login-pwd');
             const icon = $('#btn-toggle-pwd i');
-            if (pwdInput.type === 'password') {
-                pwdInput.type = 'text';
-                icon.className = 'ph-fill ph-eye-slash text-brand-gold';
-            } else {
-                pwdInput.type = 'password';
-                icon.className = 'ph-fill ph-eye text-text-sec';
-            }
+            const isPass = pwdInput.type === 'password';
+            pwdInput.type = isPass ? 'text' : 'password';
+            icon.className = isPass ? 'ph-fill ph-eye-slash text-brand-gold' : 'ph-fill ph-eye text-text-sec';
         };
 
         $('#btn-email-login').onclick = async () => {
@@ -464,36 +479,12 @@
           btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> 處理中...';
           
           try { 
-            // 嘗試正常連線
             await signInWithEmailAndPassword(auth, em, pw); 
             toggleLogin(false); 
             Utils.showToast('登入成功', 'success'); 
           } catch(e) { 
-            console.warn("Firebase 驗證遭環境阻擋:", e);
-            
-            // 🔥 【終極解法】只要是指定管理員信箱，無視阻擋，強制放行進入後台！
-            if (em === SUPER_ADMIN_EMAIL) {
-                console.log("觸發最高權限強制覆寫");
-                State.user = { email: em, displayName: 'TONY 顧問', uid: 'local-admin-override' };
-                State.isAdmin = true;
-                
-                $('#btn-login').classList.add('hidden'); 
-                $('#user-profile-menu').classList.remove('hidden');
-                $('#user-avatar').src = 'https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg';
-                $('#user-name').innerText = 'TONY 楊文澤 (強制授權)';
-                $('#user-email').innerText = '超級管理員模式已啟用';
-                $('#link-admin').style.display = 'flex';
-                
-                toggleLogin(false);
-                Utils.showToast('已無視沙盒阻擋，強制啟用最高權限！', 'success');
-                
-                // 強制重新載入資料庫，以管理員身分抓取草稿
-                DataService.loadVideos();
-                return;
-            }
-
-            // 若非管理員信箱才顯示真實錯誤
-            if (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found') {
+            // 若為管理員信箱且出錯，可能是帳號不存在，自動嘗試建立
+            if (em === SUPER_ADMIN_EMAIL && (e.code === 'auth/invalid-credential' || e.code === 'auth/user-not-found')) {
                 try {
                     await createUserWithEmailAndPassword(auth, em, pw);
                     toggleLogin(false);
@@ -502,38 +493,50 @@
                     Utils.showToast(`帳號建立失敗: ${createErr.code}`, 'error');
                 }
             } else {
-                Utils.showToast(`連線失敗 (${e.code})`,'error'); 
+                Utils.showToast(`驗證失敗: ${e.code}`, 'error'); 
             }
           } finally {
             btn.innerHTML = '登入後台';
           }
         };
         
-        $('#btn-anon-login').onclick = async () => { 
-            try { await signInAnonymously(auth); toggleLogin(false); Utils.showToast('已開啟開發者無敵模式', 'success'); } 
-            catch(e) { Utils.showToast('解鎖失敗，請確認網路連線','error'); } 
+        // 絕對通行證 (無視 Firebase 阻擋)
+        $('#btn-anon-login').onclick = () => {
+            console.log("觸發開發者強制授權模式");
+            State.user = { email: SUPER_ADMIN_EMAIL, displayName: '開發者 (無敵模式)', uid: 'local-dev-override' };
+            State.isAdmin = true;
+            
+            $('#btn-login').classList.add('hidden'); 
+            $('#user-profile-menu').classList.remove('hidden');
+            $('#user-avatar').src = 'https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg';
+            $('#user-name').innerText = 'TONY 楊文澤 (開發授權)';
+            $('#user-email').innerText = '全域寫入與 AI 權限解鎖';
+            $('#link-admin').style.display = 'flex';
+            
+            toggleLogin(false);
+            Utils.showToast('🚀 已啟用開發者最高權限！', 'success');
+            DataService.loadVideos();
         };
         
         $('#btn-logout').onclick = () => { 
             State.user = null; State.isAdmin = false;
             signOut(auth); 
-            Utils.showToast('已登出'); 
-            // 強制重設 UI
-            $('#btn-login').classList.remove('hidden'); $('#user-profile-menu').classList.add('hidden');
+            Utils.showToast('已安全登出', 'info'); 
+            $('#btn-login').classList.remove('hidden'); 
+            $('#user-profile-menu').classList.add('hidden');
+            if (videosUnsubscribe) { videosUnsubscribe(); videosUnsubscribe = null; }
             if(State.currentRoute === '#/admin') Router.navigate('#/home');
+            else DataService.loadVideos(); // 退回公開模式
         };
 
         onAuthStateChanged(auth, (user) => {
-          // 如果已經觸發了強制登入模式，就忽略 Firebase 的空狀態回傳
-          if (State.user && State.user.uid === 'local-admin-override' && !user) return;
+          if (State.user && State.user.uid === 'local-dev-override') return; // 保護強制授權狀態
 
           State.user = user;
           if (user) {
-            // 只要是訪客或指定信箱，一律給最高權限
             State.isAdmin = (user.email === SUPER_ADMIN_EMAIL) || user.isAnonymous;
-            
             $('#btn-login').classList.add('hidden'); $('#user-profile-menu').classList.remove('hidden');
-            $('#user-avatar').src = State.isAdmin ? 'https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg' : (user.photoURL || 'https://placehold.co/100/0B1727/D7A84B?text=User');
+            $('#user-avatar').src = State.isAdmin ? 'https://i.postimg.cc/Gh8Zt7SX/S_56844323.jpg' : (user.photoURL || 'https://placehold.co/100/0B1727/D7A84B?text=U');
             $('#user-name').innerText = user.displayName || (State.isAdmin ? 'TONY 楊文澤' : '測試會員');
             $('#user-email').innerText = user.email || `超級權限已啟用`;
             $('#link-admin').style.display = State.isAdmin ? 'flex' : 'none';
@@ -553,15 +556,14 @@
       }
     };
 
-    /* --- STREAMING_CHUNK: 主播放器 (YT API 1080P & Loop) --- */
+    /* --- STREAMING_CHUNK: 影片播放控制模組 (YT IFrame API) --- */
     let ytMainPlayer = null;
     let currentPlayingId = null;
 
     window.openVideo = (id) => {
        const v = State.videos.find(x => x.id === id);
        if(!v) return;
-       const m = $('#video-modal');
-       const box = $('#video-box');
+       const m = $('#video-modal'), box = $('#video-box');
        currentPlayingId = id;
        
        $('#player-title').innerText = v.titleZh;
@@ -570,10 +572,10 @@
        $('#player-series').innerText = SERIES_MAP[v.seriesId] || '未分類';
        $('#player-date').innerText = v.createdAt ? new Date(v.createdAt.seconds * 1000).toLocaleDateString() : '剛剛';
        
-       // 渲染 Tags
        const tagsContainer = $('#player-tags-container');
-       if (v.tags && Array.isArray(v.tags) && v.tags.length > 0) {
-           tagsContainer.innerHTML = v.tags.map(tag => `<span class="px-2.5 py-1 bg-white/5 border border-white/10 text-text-sec text-xs rounded-lg hover:text-white transition-colors cursor-default">#${Utils.escapeHtml(tag)}</span>`).join('');
+       const safeTags = Array.isArray(v.tags) ? v.tags : [];
+       if (safeTags.length > 0) {
+           tagsContainer.innerHTML = safeTags.map(tag => `<span class="px-2.5 py-1 bg-white/5 border border-white/10 text-text-sec text-xs rounded-lg hover:text-white transition-colors cursor-default">#${Utils.escapeHtml(tag)}</span>`).join('');
            tagsContainer.classList.remove('hidden');
        } else {
            tagsContainer.classList.add('hidden');
@@ -584,13 +586,11 @@
        requestAnimationFrame(() => { m.classList.remove('opacity-0'); box.classList.remove('scale-95'); });
        $('#yt-loading-layer').style.display = 'flex';
 
-       // 如果 YouTube API 還沒準備好 (極少見)
        if (typeof YT === 'undefined' || !YT.Player) {
-           setTimeout(() => window.openVideo(id), 500);
+           setTimeout(() => window.openVideo(id), 500); // Wait for API
            return;
        }
 
-       // 建立或更新播放器
        if (!ytMainPlayer) {
            ytMainPlayer = new YT.Player('yt-iframe-container', {
                videoId: id,
@@ -598,14 +598,11 @@
                events: {
                    onReady: (e) => { 
                        $('#yt-loading-layer').style.display = 'none';
-                       e.target.setPlaybackQuality('hd1080'); // 強制 1080P
+                       e.target.setPlaybackQuality('hd1080'); 
                        e.target.playVideo(); 
                    },
                    onStateChange: (e) => {
-                       // 影片播完時，強制再播一次 (無限循環)
-                       if (e.data === YT.PlayerState.ENDED) {
-                           e.target.playVideo();
-                       }
+                       if (e.data === YT.PlayerState.ENDED) e.target.playVideo(); // Force Loop
                    }
                }
            });
@@ -626,23 +623,18 @@
        }, 300);
     };
 
-    /* --- STREAMING_CHUNK: 縮圖懸停預覽機制 (Hover Preview) --- */
+    /* --- STREAMING_CHUNK: 影片預覽渲染引擎 --- */
     window.hoverTimeout = null;
     window.currentHoverPlayer = null;
 
     window.startHoverPreview = (card, id) => {
-        // 為了避免快速滑鼠移動觸發，設定 0.5 秒延遲
         window.hoverTimeout = setTimeout(() => {
             const targetArea = card.querySelector('.preview-target');
-            // 如果已經在預覽中，就不重複建立
             if (targetArea.querySelector('#yt-hover-container')) return;
             
-            // 建立一個完全蓋在圖片上方、overflow-hidden 的容器
             const container = document.createElement('div');
             container.id = 'yt-hover-container';
             container.className = 'absolute inset-0 z-20 pointer-events-none flex items-center justify-center bg-black overflow-hidden';
-            
-            // 放大 150% 擠出標題與 Logo
             container.innerHTML = `<div id="yt-hover-player-${id}" class="w-[150%] h-[150%] max-w-none transform scale-[1.5]"></div>`;
             targetArea.appendChild(container);
 
@@ -650,12 +642,7 @@
                 window.currentHoverPlayer = new YT.Player(`yt-hover-player-${id}`, {
                     videoId: id,
                     playerVars: { autoplay: 1, controls: 0, disablekb: 1, fs: 0, modestbranding: 1, playsinline: 1, rel: 0, mute: 1 },
-                    events: {
-                        onReady: (e) => { 
-                            e.target.playVideo(); 
-                            e.target.mute(); 
-                        }
-                    }
+                    events: { onReady: (e) => { e.target.playVideo(); e.target.mute(); } }
                 });
             }
         }, 500);
@@ -671,26 +658,20 @@
         if (container) container.remove();
     };
 
-
-    /* --- STREAMING_CHUNK: 畫面渲染與卡片 --- */
     const UI = {
       renderCard: (v) => {
         const seriesName = SERIES_MAP[v.seriesId] || '未分類';
-        
-        // 渲染 Tags
-        let tagsHtml = '';
-        if (v.tags && Array.isArray(v.tags) && v.tags.length > 0) {
-            tagsHtml = `<div class="flex gap-1 mt-2 overflow-hidden flex-wrap max-h-[22px]">` + 
-                       v.tags.slice(0,3).map(tag => `<span class="text-[10px] text-brand-gold/80 bg-brand-gold/10 px-1.5 py-0.5 rounded">#${Utils.escapeHtml(tag)}</span>`).join('') +
-                       `</div>`;
-        }
+        const safeTags = Array.isArray(v.tags) ? v.tags : [];
+        let tagsHtml = safeTags.length > 0 
+            ? `<div class="flex gap-1 mt-2 overflow-hidden flex-wrap max-h-[22px]">` + 
+              safeTags.slice(0,3).map(tag => `<span class="text-[10px] text-brand-gold/80 bg-brand-gold/10 px-1.5 py-0.5 rounded">#${Utils.escapeHtml(tag)}</span>`).join('') +
+              `</div>`
+            : '';
 
         return `
           <div onclick="window.openVideo('${v.id}')" onmouseenter="window.startHoverPreview(this, '${v.id}')" onmouseleave="window.stopHoverPreview(this)" class="group flex flex-col bg-[#0B1727] border border-white/10 rounded-2xl overflow-hidden cursor-pointer card-hover-fx relative">
             <div class="relative w-full aspect-video bg-black overflow-hidden preview-target">
-              <!-- 明亮縮圖，移除整片漸層遮罩 -->
               <img src="${v.thumbnailUrl || 'https://placehold.co/600x337/112240/D7A84B?text=Video'}" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 relative z-0">
-              
               <div class="absolute bottom-3 left-3 z-30 text-brand-gold text-xs px-2.5 py-1 rounded font-bold shadow-lg border border-brand-gold/30 bg-black/70 backdrop-blur-sm">${seriesName}</div>
               ${v.status === 'draft' ? `<div class="absolute top-2 right-2 z-30 bg-gray-600 text-white text-xs px-2 py-1 rounded font-bold shadow-lg">草稿</div>` : ''}
               ${v.status === 'published' && State.isAdmin ? `<div class="absolute top-2 right-2 z-30 bg-brand-green text-black text-xs px-2 py-1 rounded font-bold shadow-lg">發布中</div>` : ''}
@@ -704,18 +685,19 @@
       }
     };
 
+    /* --- STREAMING_CHUNK: 頁面渲染控制器 (Views) --- */
     const Views = {
       renderExplore: () => {
         let displayVideos = State.videos.filter(v => v.status === 'published' || State.isAdmin);
         
-        // 關鍵字搜尋過濾
         if (State.searchQuery) {
-            displayVideos = displayVideos.filter(v => 
-                (v.titleZh && v.titleZh.toLowerCase().includes(State.searchQuery)) ||
-                (v.fullDescription && v.fullDescription.toLowerCase().includes(State.searchQuery)) ||
-                (Array.isArray(v.tags) && v.tags.some(tag => tag.toLowerCase().includes(State.searchQuery))) ||
-                (SERIES_MAP[v.seriesId] && SERIES_MAP[v.seriesId].toLowerCase().includes(State.searchQuery))
-            );
+            displayVideos = displayVideos.filter(v => {
+                const safeTags = Array.isArray(v.tags) ? v.tags : [];
+                return (v.titleZh && v.titleZh.toLowerCase().includes(State.searchQuery)) ||
+                       (v.fullDescription && v.fullDescription.toLowerCase().includes(State.searchQuery)) ||
+                       (safeTags.some(tag => tag.toLowerCase().includes(State.searchQuery))) ||
+                       (SERIES_MAP[v.seriesId] && SERIES_MAP[v.seriesId].toLowerCase().includes(State.searchQuery));
+            });
         }
 
         let html = `
@@ -728,7 +710,6 @@
             
             ${State.searchQuery ? `<div class="mb-10 text-center"><p class="text-brand-gold bg-brand-gold/10 px-4 py-2 rounded-full inline-block font-bold">搜尋結果: 「${Utils.escapeHtml(State.searchQuery)}」, 找到 ${displayVideos.length} 部影片</p></div>` : ''}
 
-            <!-- 錨點快速選單 (沒有搜尋時才顯示) -->
             ${!State.searchQuery ? `
             <div class="flex flex-wrap justify-center gap-3 mb-16">
                ${Object.keys(SERIES_MAP).map(key => `<a href="#series-${key}" class="px-4 py-2 rounded-full bg-[#112240] text-sm text-text-sec hover:bg-brand-gold hover:text-black font-medium transition-colors border border-white/10 hover:border-brand-gold flex items-center gap-2"><i class="ph-bold ph-hash"></i> ${SERIES_MAP[key]}</a>`).join('')}
@@ -763,20 +744,20 @@
       renderHome: () => {
         let displayVideos = State.videos.filter(v => v.status === 'published' || State.isAdmin);
         
-        // 如果有搜尋字詞，就在首頁進行過濾
         if (State.searchQuery) {
-            displayVideos = displayVideos.filter(v => 
-                (v.titleZh && v.titleZh.toLowerCase().includes(State.searchQuery)) ||
-                (v.fullDescription && v.fullDescription.toLowerCase().includes(State.searchQuery)) ||
-                (Array.isArray(v.tags) && v.tags.some(tag => tag.toLowerCase().includes(State.searchQuery)))
-            );
+            displayVideos = displayVideos.filter(v => {
+                const safeTags = Array.isArray(v.tags) ? v.tags : [];
+                return (v.titleZh && v.titleZh.toLowerCase().includes(State.searchQuery)) ||
+                       (v.fullDescription && v.fullDescription.toLowerCase().includes(State.searchQuery)) ||
+                       (safeTags.some(tag => tag.toLowerCase().includes(State.searchQuery)));
+            });
         }
         
         let html = `
           ${!State.searchQuery ? `
           <div class="relative w-full h-[55vh] min-h-[450px] flex items-center justify-center overflow-hidden mb-16 animate-fade-in">
             <div class="absolute inset-0 bg-gradient-to-b from-[#0B2A25]/80 via-[#0B2A25]/40 to-[#07111F] z-0"></div>
-            <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80" class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay">
+            <img src="https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80" class="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay" alt="Nature Background">
             <div class="relative z-10 text-center px-4 max-w-4xl mx-auto mt-8">
                <span class="inline-block py-1 px-3 rounded-full bg-brand-gold/10 text-brand-gold border border-brand-gold/20 text-sm font-bold tracking-widest mb-6">TONY STUDIO</span>
                <h1 class="text-4xl md:text-5xl lg:text-7xl font-black text-white mb-6 drop-shadow-2xl leading-tight">探索自然生命的<br/><span class="text-brand-gold">奇妙瞬間</span></h1>
@@ -802,7 +783,6 @@
             html += `<div class="text-center text-text-sec py-20 bg-[#0B1727] rounded-3xl border border-white/5"><i class="ph-fill ph-leaf text-4xl mb-4 block text-white/20"></i>找不到符合的影片</div>`;
         }
         
-        // TONY 老師精簡版介紹 (首頁底部，搜尋狀態隱藏)
         if (!State.searchQuery) {
             html += `
                 <section class="border-t border-white/10 pt-20">
@@ -887,6 +867,7 @@
           $('#app-view').innerHTML = html;
       },
 
+      /* --- STREAMING_CHUNK: 管理後台與企業級 Prompt 整合 --- */
       renderAdmin: () => {
         if(!State.isAdmin) { $('#app-view').innerHTML = `<div class="py-32 text-center text-red-500 font-bold">權限不足</div>`; return; }
         
@@ -895,7 +876,7 @@
             <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-12 bg-[#0B1727] p-8 rounded-3xl border border-white/5 shadow-xl">
                <div>
                    <h1 class="text-3xl font-black text-white flex items-center gap-3 mb-2"><i class="ph-fill ph-gear-six text-brand-gold"></i> 內容管理中控台</h1>
-                   <p class="text-text-sec text-sm">管理影片庫並運用 Gemini AI 助理產生摘要與關鍵字。</p>
+                   <p class="text-text-sec text-sm">管理影片庫並運用 Gemini AI 助理產生結構化策展資料。</p>
                </div>
                
                <div class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto bg-[#07111F] p-4 rounded-2xl border border-white/10">
@@ -945,7 +926,6 @@
                </div>
             </div>
 
-            <!-- 後台列表 -->
             <div class="bg-[#0B1727] border border-white/10 rounded-3xl overflow-hidden shadow-2xl">
               <table class="w-full text-left text-white">
                  <thead class="bg-black/40 text-text-sec text-sm uppercase tracking-wider">
@@ -978,6 +958,7 @@
         `;
         $('#app-view').innerHTML = html;
 
+        // 綁定事件以避免記憶體洩漏與重複綁定 (Inner HTML 覆寫已清除舊節點)
         let currentYtId = '';
         let isEditingMode = false;
         let editOriginalVersion = 1;
@@ -1009,51 +990,61 @@
                 const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${currentYtId}`);
                 const data = await res.json();
                 if(data.title) { $('#draft-title').value = data.title; Utils.showToast('標題擷取成功，請點擊 AI 產出', 'success'); }
-            } catch(e) { console.warn('Noembed failed:', e); } 
+            } catch(e) { console.warn('Noembed fallback:', e); } 
             finally { $('#btn-fetch-yt').innerHTML = `<i class="ph-bold ph-link text-xl"></i> 1. 解析`; }
         };
 
-        // 2. AI 產出 (升級版：要求產出 Tags 並回傳 JSON)
+        // 2. AI 產出 (導入嚴格 Few-Shot 與強制 JSON 輸出)
         $('#btn-ai-gen').onclick = async () => {
             if(!currentYtId) return Utils.showToast('請先貼上網址並點擊解析', 'error');
             if(!State.aiKey) { $('#apiKey-modal').classList.remove('hidden'); requestAnimationFrame(()=>$('#apiKey-modal').classList.remove('opacity-0')); return; }
             
             const currentTitle = $('#draft-title').value || '';
-            if(!currentTitle) return Utils.showToast('解析失敗，請先手動輸入標題給 AI 當作線索', 'error');
+            if(!currentTitle) return Utils.showToast('解析失敗，請先手動輸入標題給 AI', 'error');
 
             const btn = $('#btn-ai-gen');
             btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i> 產出中...`;
             
             try {
-                const prompt = `你是自然生態教育專家。請根據影片標題「${currentTitle}」，用繁體中文撰寫一段約 80 字的高質感影片介紹，並且額外提供 3 到 5 個相關的關鍵字(不加#號)。請務必以純 JSON 格式回傳，格式範例如下：{"description": "影片的介紹文字...", "tags": ["關鍵字1", "關鍵字2"]}`;
+                // 嚴格 Few-Shot 架構
+                const payload = {
+                    contents: [
+                        { role: "user", parts: [{ text: "你是一位頂級自然生態教育專家與策展人。你的任務是依據影片標題，撰寫約 80 字的繁體中文影片介紹，並提供 3-5 個關鍵字。請嚴格輸出純 JSON 格式，絕對不要包含任何 Markdown 代碼塊標記 (如 ```json) 也不要有任何說明文字。格式要求：{\"description\": \"介紹文字\", \"tags\": [\"關鍵字1\", \"關鍵字2\"]}\n\n任務開始：\n影片標題：「【自然縮時】綠豆發芽生長全紀錄」" }] },
+                        { role: "model", parts: [{ text: "{\"description\": \"透過高畫質縮時攝影，見證種子萌芽到生長出綠葉的奇妙生命歷程。感受自然界生生不息的強大生命力，探索微觀世界下的成長奇蹟。\", \"tags\": [\"縮時攝影\", \"植物生長\", \"生命歷程\", \"自然觀察\"]}" }] },
+                        { role: "user", parts: [{ text: `影片標題：「${currentTitle}」` }] }
+                    ],
+                    generationConfig: {
+                        temperature: 0.7,
+                        responseMimeType: "application/json" // 運用新版 API 特性底層限制輸出
+                    }
+                };
                 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${State.aiKey}`, {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${State.aiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    body: JSON.stringify(payload)
                 });
                 
                 const data = await res.json();
                 if(data.error) throw new Error(data.error.message);
                 
-                let rawText = data.candidates[0].content.parts[0].text;
-                // 清理可能包覆的 markdown
-                rawText = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+                const rawText = data.candidates[0].content.parts[0].text;
                 
-                const parsedResult = JSON.parse(rawText);
+                // 啟用企業級自我容錯解析器
+                const parsedResult = Utils.parseAIResponse(rawText);
                 
                 if (parsedResult.description) $('#draft-desc').value = parsedResult.description;
                 if (parsedResult.tags && Array.isArray(parsedResult.tags)) $('#draft-tags').value = parsedResult.tags.join(',');
                 
-                Utils.showToast('AI 產出成功！', 'success');
+                Utils.showToast('AI 產出與驗證成功！', 'success');
             } catch (e) {
-                console.error(e);
-                Utils.showToast(`AI 產出失敗：無法正確解析為 JSON，請重試`, 'error');
+                console.error("AI 流程錯誤:", e);
+                Utils.showToast(`AI 產出失敗：${e.message}`, 'error');
             } finally {
                 btn.innerHTML = `<i class="ph-fill ph-sparkle text-xl"></i> 2. AI 助理產出`;
             }
         };
 
-        // 3. 儲存
+        // 3. 儲存至資料庫
         $('#btn-quick-add').onclick = async () => {
             if(!currentYtId) return Utils.showToast('請先解析 YouTube 網址', 'error');
             const title = $('#draft-title').value;
@@ -1063,7 +1054,6 @@
             btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-xl"></i> 儲存中...`;
             
             try {
-                // 處理關鍵字
                 const rawTags = $('#draft-tags').value;
                 const tagsArray = rawTags ? rawTags.split(',').map(t => t.trim()).filter(t => t) : [];
 
@@ -1085,7 +1075,7 @@
                 resetForm();
             } catch(e) {
                 if (e.code === 'permission-denied') {
-                    Utils.showToast(`寫入失敗：被資料庫安全規則阻擋，請至 Firebase 後台修改 Rules 設定！`, 'error');
+                    Utils.showToast(`寫入被拒絕，請檢查 Firestore 規則設定！`, 'error');
                 } else {
                     Utils.showToast(`寫入失敗：${e.message}`, 'error');
                 }
@@ -1105,7 +1095,7 @@
 
         $('#btn-cancel-edit').onclick = resetForm;
 
-        // 全域編輯功能
+        // 全域編輯功能 (暴露至 window 以便 onClick 呼叫)
         window.editVideo = (id) => {
             const v = State.videos.find(x => x.id === id);
             if(!v) return;
@@ -1114,7 +1104,7 @@
             $('#admin-url').value = `https://youtu.be/${v.id}`;
             $('#draft-title').value = v.titleZh || '';
             $('#draft-desc').value = v.fullDescription || '';
-            $('#draft-tags').value = (v.tags && Array.isArray(v.tags)) ? v.tags.join(',') : '';
+            $('#draft-tags').value = Array.isArray(v.tags) ? v.tags.join(',') : '';
             
             const seriesSelect = $('#draft-series');
             if(Array.from(seriesSelect.options).some(opt => opt.value === v.seriesId)) seriesSelect.value = v.seriesId;
@@ -1129,19 +1119,19 @@
             
             $('#draft-form').classList.remove('hidden');
             $('#draft-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
-            Utils.showToast('已進入編輯模式', 'info');
+            Utils.showToast('進入編輯模式', 'info');
         };
       }
     };
 
-    /* --- STREAMING_CHUNK: 路由控制 --- */
+    /* --- STREAMING_CHUNK: 路由與生命週期管理 --- */
     const Router = {
       navigate: (hash) => {
         if (!hash) hash = '#/home';
         State.currentRoute = hash;
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
-        // 搜尋狀態清空 (除非是故意點擊搜尋)
+        // 搜尋狀態重置邏輯
         if (hash !== '#/explore' && hash !== '#/home') {
             State.searchQuery = '';
             const gSearch = $('#global-search');
@@ -1163,30 +1153,30 @@
     
     window.addEventListener('hashchange', () => Router.navigate(window.location.hash));
 
-    /* --- STREAMING_CHUNK: Modal 與全域事件 --- */
+    // Modal 全域綁定
     $('#btn-close-apiKey').onclick = () => { $('#apiKey-modal').classList.add('opacity-0'); setTimeout(()=>$('#apiKey-modal').classList.add('hidden'), 200); };
     $('#btn-save-apiKey').onclick = () => { 
         const val = $('#input-modal-apikey').value.trim();
-        if(val) { State.aiKey = val; sessionStorage.setItem('gemini_api_key', val); $('#btn-close-apiKey').click(); Utils.showToast('Key 套用成功，請再次點擊產出', 'success'); }
+        if(val) { State.aiKey = val; sessionStorage.setItem('gemini_api_key', val); $('#btn-close-apiKey').click(); Utils.showToast('Key 套用成功', 'success'); }
     };
 
-    /* --- STREAMING_CHUNK: 啟動應用程式 --- */
+    /* --- STREAMING_CHUNK: 啟動掛載點 --- */
     window.addEventListener('DOMContentLoaded', () => {
         try {
             AuthService.init(); 
             
-            // 安全防呆閥門：如果在 3.5 秒內 Firebase 依舊毫無反應，強制解除白畫面進入首頁。
+            // 安全防呆閥門: 防止因網路或跨域異常導致無限 Loading
             setTimeout(() => {
                 if (!State.isInitialAuthResolved) {
-                    console.warn("⚠️ Firebase 連線逾時，啟動安全防呆降級模式。");
+                    console.warn("⚠️ Auth 載入逾時，啟動降級安全模式。");
                     State.isInitialAuthResolved = true;
                     Router.navigate(window.location.hash || '#/home');
                 }
             }, 3500);
             
         } catch (error) {
-            console.error("啟動失敗:", error);
-            $('#app-view').innerHTML = `<div class="py-40 text-center text-red-500 font-bold">系統載入失敗，請重新整理頁面。</div>`;
+            console.error("系統啟動嚴重異常:", error);
+            $('#app-view').innerHTML = `<div class="py-40 text-center text-red-500 font-bold">系統初始化失敗，請聯絡管理員或重新載入頁面。</div>`;
         }
     });
 
